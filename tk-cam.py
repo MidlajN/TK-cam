@@ -1,33 +1,56 @@
 # a program to use tkinter for capturing camera
+from ast import Return
 from cProfile import label
-from email.mime import image
-import imp
-from sys import implementation
+import tkinter as tk
 from tkinter import *
 from PIL import Image,ImageTk
 import cv2
 
-win = Tk()
+class TKCam:
+    def __init__(self):
+        
+        # Tkinter GUI
+        self.win = tk.Tk()
+        self.win.geometry("1200x500")
+        self.win.title("TK_Cam")
 
-win.geometry("1200x500")
-win.title("TK_Cam")
 
-label = Label(win)
-label.grid(row=0,column=0 , padx= 3,pady=7)
-cap = cv2.VideoCapture(0)
+        # Tkinter GUI left part
+        self.left_side = tk.Frame(self.win)
+        self.label = Label(self.win)
+        self.label.grid(row=0,column=0 , padx= 5,pady=7)
+        self.label.pack(side=tk.LEFT)
+        self.left_side.pack()
 
-# Function to show frame
-def show_frame():
-    
-    image = cv2.cvtColor(cap.read()[1],cv2.COLOR_BGR2RGB)
-    img = Image.fromarray(image)
+        self.cap = cv2.VideoCapture(0)
 
-    imgtk = ImageTk.PhotoImage(image=img)
-    label.imgtk = imgtk
-    label.configure(image=imgtk)
 
-    label.after(10,show_frame)
+    def get_frame(self):
+            if self.cap.isOpened():
+                ret ,frame = self.cap.read()
+                return ret , cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
 
-show_frame()
-win.mainloop()
+
+    # Function to show frame
+    def show_frame(self):
+        ret,self.image = self.get_frame()
+        if ret:
+            img = Image.fromarray(self.image)
+            imgtk = ImageTk.PhotoImage(image=img)
+            self.label.imgtk = imgtk
+            self.label.configure(image=imgtk)
+        self.win.after(10, self.show_frame)
+   
+
+    def run(self):
+        self.show_frame()
+        self.win.mainloop()
+ 
+       
+def main():
+    tk_cam = TKCam()
+    tk_cam.run()
+
+if __name__ == '__main__':
+    main()
 
