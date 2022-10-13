@@ -1,6 +1,8 @@
 # a program to use tkinter for capturing camera
-from ast import Return
-from cProfile import label
+
+from calendar import c
+import re
+from sqlite3 import Row
 import time
 import tkinter as tk
 from tkinter import font as tkfont
@@ -8,14 +10,14 @@ from tkinter import *
 from PIL import Image,ImageTk
 import cv2
 
+
 class TKCam:
     def __init__(self):
         
         # Tkinter GUI
         self.win = tk.Tk()
-        self.win.geometry("1200x480")
+        self.win.geometry("1000x480")
         self.win.title("TK_Cam")
-
 
         # Tkinter GUI left part
         self.left_side = tk.Frame(self.win)
@@ -29,8 +31,7 @@ class TKCam:
         self.label_for_fps = tk.Label(self.right_side , text="")
 
         self.font_title = tkfont.Font(family='Helvetica', size=20 , weight='bold')
-
-
+        self.font_sub_title = tkfont.Font(family='Helvetica', size=15, weight='bold')
 
         # frame rate
         self.start_time = time.time()
@@ -39,9 +40,10 @@ class TKCam:
         self.frame_time = 0
         self.frame_start_time = 0
 
-
         # for getting camera access
         self.cap = cv2.VideoCapture(0)
+        self.path = '/home/heisenberg/Desktop/GIT/TKCam/'
+        self.cnt = 0
 
     def GUI_info (self):
         tk.Label(self.right_side, text= "TK-Cam", font=self.font_title).grid(row=0,
@@ -49,15 +51,18 @@ class TKCam:
 
         tk.Label(self.right_side, text="FPS : ").grid(row=1, column=0, columnspan=2, sticky=tk.W, padx=5, pady=2)
         self.label_for_fps.grid(row=1, column=2, sticky=tk.W)
+        
+        tk.Label(self.right_side, text="Capture Image", font=self.font_sub_title).grid(row=3,
+                column=0, columnspan=2, sticky=tk.W, padx=5, pady=20)
+        tk.Button(self.right_side, text='Capture Current Image', command=self.capture_image).grid(row=4,
+                column=0, sticky=tk.W, padx=2, pady=2)
 
         self.right_side.pack()
-
 
     def get_frame(self):
             if self.cap.isOpened():
                 ret ,frame = self.cap.read()
                 return ret , cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-
 
     # Function to show frame
     def show_frame(self):
@@ -83,7 +88,12 @@ class TKCam:
         self.frame_start_time = now
 
         self.label_for_fps["text"] = str(self.fps.__round__(2))
-   
+    
+    def capture_image(self):
+        self.c_image = self.image
+        self.c_image = cv2.cvtColor(self.c_image, cv2.COLOR_BGR2RGBA)
+        cv2.imwrite(self.path+ '/image_' + str(self.cnt) + '.jpg', self.c_image)
+        self.cnt += 1   
 
     def run(self):
         self.show_frame()
@@ -94,6 +104,7 @@ class TKCam:
 def main():
     tk_cam = TKCam()
     tk_cam.run()
+
 
 if __name__ == '__main__':
     main()
