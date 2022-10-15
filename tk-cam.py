@@ -1,14 +1,15 @@
 # a program to use tkinter for capturing camera
 
-from calendar import c
+from cProfile import label
+from email.mime import image
 import re
-from sqlite3 import Row
 import time
 import tkinter as tk
 from tkinter import font as tkfont
 from tkinter import *
 from PIL import Image,ImageTk
 import cv2
+from numpy import imag, pad
 
 
 class TKCam:
@@ -22,13 +23,13 @@ class TKCam:
         # Tkinter GUI left part
         self.left_side = tk.Frame(self.win)
         self.label = Label(self.win)
-        # self.label.grid(row=0,column=0 , padx= 0,pady=0)
         self.label.pack(side=tk.LEFT)
         self.left_side.pack()
         
         # Tkinter GUI right part
         self.right_side = tk.Frame(self.win)
         self.label_for_fps = tk.Label(self.right_side , text="")
+        self.label_for_image = tk.Label(self.right_side)
 
         self.font_title = tkfont.Font(family='Helvetica', size=20 , weight='bold')
         self.font_sub_title = tkfont.Font(family='Helvetica', size=15, weight='bold')
@@ -56,6 +57,7 @@ class TKCam:
                 column=0, columnspan=2, sticky=tk.W, padx=5, pady=20)
         tk.Button(self.right_side, text='Capture Current Image', command=self.capture_image).grid(row=4,
                 column=0, sticky=tk.W, padx=2, pady=2)
+        tk.Button(self.right_side, text= 'Exit', command=self.exit).grid(row=7, column=0,padx=3,pady=5,sticky=tk.W)
 
         self.right_side.pack()
 
@@ -92,8 +94,23 @@ class TKCam:
     def capture_image(self):
         self.c_image = self.image
         self.c_image = cv2.cvtColor(self.c_image, cv2.COLOR_BGR2RGBA)
-        cv2.imwrite(self.path+ '/image_' + str(self.cnt) + '.jpg', self.c_image)
-        self.cnt += 1   
+        cv2.imwrite(self.path+ 'image_' + str(self.cnt) + '.jpg', self.c_image)
+        self.cnt += 1 
+        self.image_viewer()  
+        
+    def image_viewer(self):
+        self.cnt -= 1
+        self.view = Image.open('image_' + str(self.cnt) + '.jpg')
+        self.image_view = self.view.resize((200,150))
+        self.resized_img = ImageTk.PhotoImage(self.image_view)
+        self.label_for_image = tk.Label(self.right_side, image= self.resized_img).grid(row=5,
+                                        column=0, columnspan=3, sticky=tk.W, padx=3,pady=5)
+        tk.Label(self.right_side,text= 'image_' + str(self.cnt) + '.jpg').grid(row=6,
+                column=0,columnspan=3,padx=60,sticky=tk.W)
+        self.cnt+=1
+        
+    def exit(self):
+        self.win.destroy()
 
     def run(self):
         self.show_frame()
