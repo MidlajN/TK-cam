@@ -9,7 +9,6 @@ from tkinter import font as tkfont
 from tkinter import *
 from PIL import Image,ImageTk
 import cv2
-from numpy import imag, pad
 
 
 class TKCam:
@@ -43,7 +42,7 @@ class TKCam:
 
         # for getting camera access
         self.cap = cv2.VideoCapture(0)
-        self.path = '/home/heisenberg/Desktop/GIT/TKCam/'
+        self.path = '/home/heisenberg/Desktop/GIT/TKCam/images/'
         self.cnt = 0
 
     def GUI_info (self):
@@ -100,7 +99,7 @@ class TKCam:
         
     def image_viewer(self):
         self.cnt -= 1
-        self.view = Image.open('image_' + str(self.cnt) + '.jpg')
+        self.view = Image.open(self.path + 'image_' + str(self.cnt) + '.jpg')
         self.image_view = self.view.resize((200,150))
         self.resized_img = ImageTk.PhotoImage(self.image_view)
         self.label_for_image = tk.Label(self.right_side, image= self.resized_img).grid(row=5,
