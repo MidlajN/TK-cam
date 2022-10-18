@@ -1,8 +1,5 @@
 # a program to use tkinter for capturing camera
 
-from cProfile import label
-from email.mime import image
-import re
 import time
 import tkinter as tk
 from tkinter import font as tkfont
