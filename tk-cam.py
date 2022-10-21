@@ -1,5 +1,6 @@
 # a program to use tkinter for capturing camera
 
+import os
 import time
 import tkinter as tk
 from tkinter import font as tkfont
@@ -39,21 +40,21 @@ class TKCam:
 
         # for getting camera access
         self.cap = cv2.VideoCapture(0)
-        self.path = '/home/heisenberg/Desktop/GIT/TKCam/images/'
         self.cnt = 0
 
     def GUI_info (self):
         tk.Label(self.right_side, text= "TK-Cam", font=self.font_title).grid(row=0,
                 column=0, columnspan=3, sticky=tk.W, padx=5, pady=20)
 
-        tk.Label(self.right_side, text="FPS : ").grid(row=1, column=0, columnspan=2, sticky=tk.W, padx=5, pady=2)
-        self.label_for_fps.grid(row=1, column=2, sticky=tk.W)
+        tk.Label(self.right_side, text="FPS : ").grid(row=1, column=0, columnspan=1, sticky=tk.W, padx=5, pady=2)
+        self.label_for_fps.grid(row=1, column=1, sticky=tk.W)
         
         tk.Label(self.right_side, text="Capture Image", font=self.font_sub_title).grid(row=3,
                 column=0, columnspan=2, sticky=tk.W, padx=5, pady=20)
-        tk.Button(self.right_side, text='Capture Current Image', command=self.capture_image).grid(row=4,
-                column=0, sticky=tk.W, padx=2, pady=2)
-        tk.Button(self.right_side, text= 'Exit', command=self.exit).grid(row=7, column=0,padx=3,pady=5,sticky=tk.W)
+        tk.Button(self.right_side, text='   Capture Current Image   ', command=self.capture_image).grid(row=4,
+                column=0,columnspan=2, sticky=tk.W, padx=2, pady=2)
+        tk.Button(self.right_side, text= 'Clear Data & Exit', command=self.clear).grid(row=8, column=0,padx=3, pady=5,sticky=tk.W)
+        tk.Button(self.right_side, text="Exit", command=self.exit).grid(row=8, column=1, padx=3, pady= 5, sticky=tk.W)
 
         self.right_side.pack()
 
@@ -90,14 +91,14 @@ class TKCam:
     def capture_image(self):
         self.c_image = self.image
         self.c_image = cv2.cvtColor(self.c_image, cv2.COLOR_BGR2RGBA)
-        cv2.imwrite(self.path+ 'image_' + str(self.cnt) + '.jpg', self.c_image)
+        cv2.imwrite('images/image_' + str(self.cnt) + '.jpg', self.c_image)
         self.cnt += 1 
         self.image_viewer()  
         
     def image_viewer(self):
         self.cnt -= 1
-        self.view = Image.open(self.path + 'image_' + str(self.cnt) + '.jpg')
-        self.image_view = self.view.resize((200,150))
+        self.view = Image.open('images/image_' + str(self.cnt) + '.jpg')
+        self.image_view = self.view.resize((197,150))
         self.resized_img = ImageTk.PhotoImage(self.image_view)
         self.label_for_image = tk.Label(self.right_side, image= self.resized_img).grid(row=5,
                                         column=0, columnspan=3, sticky=tk.W, padx=3,pady=5)
@@ -105,6 +106,12 @@ class TKCam:
                 column=0,columnspan=3,padx=60,sticky=tk.W)
         self.cnt+=1
         
+    def clear(self):
+        self.img_cnt = os.listdir('images/')
+        for i in range (len(self.img_cnt)):
+            os.remove('images/'+self.img_cnt[i])
+        self.win.destroy()
+       
     def exit(self):
         self.win.destroy()
 
